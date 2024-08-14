@@ -12,9 +12,9 @@ struct Ticket {
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 enum Status {
+    Done,
     ToDo,
     InProgress,
-    Done,
 }
 
 impl Ticket {
@@ -30,6 +30,9 @@ impl Ticket {
         }
         if description.len() > 500 {
             panic!("Description cannot be longer than 500 characters");
+        }
+        if status != Status::Done && status != Status::InProgress && status != Status::ToDo {
+            panic!("Only `To-Do`, `In Progress`, and `Done` statuses are allowed");
         }
 
         Ticket {

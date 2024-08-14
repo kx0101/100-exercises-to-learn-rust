@@ -3,17 +3,65 @@
 //  The docs for the `std::fmt` module are a good place to start and look for examples:
 //  https://doc.rust-lang.org/std/fmt/index.html#write
 
+use std::error::Error;
+use std::fmt::{self, Formatter};
+use std::fmt::{Debug, Display};
+
 enum TicketNewError {
     TitleError(String),
     DescriptionError(String),
 }
+
+impl Debug for TicketNewError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            TicketNewError::TitleError(msg) => write!(f, "{:?}", msg),
+            TicketNewError::DescriptionError(msg) => write!(f, "{:?}", msg),
+        }
+    }
+}
+
+impl Display for TicketNewError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            TicketNewError::TitleError(msg) => write!(f, "{}", msg),
+            TicketNewError::DescriptionError(msg) => write!(f, "{}", msg),
+        }
+    }
+}
+
+impl Error for TicketNewError {}
 
 // TODO: `easy_ticket` should panic when the title is invalid, using the error message
 //   stored inside the relevant variant of the `TicketNewError` enum.
 //   When the description is invalid, instead, it should use a default description:
 //   "No description provided".
 fn easy_ticket(title: String, description: String, status: Status) -> Ticket {
-    todo!()
+    if title.is_empty() {
+        panic!(
+            "{:?}",
+            TicketNewError::TitleError("Title cannot be empty".to_string())
+        );
+    }
+
+    if title.len() > 50 {
+        panic!(
+            "{:?}",
+            TicketNewError::TitleError("Title cannot be longer than 50 characters".to_string())
+        );
+    }
+
+    let description = if description.is_empty() || description.len() > 500 {
+        "Description not provided".to_string()
+    } else {
+        description
+    };
+
+    Ticket {
+        title,
+        description,
+        status,
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
